@@ -1,0 +1,61 @@
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ChangePasswordCardComponent } from 'src/app/shared/change-password-card/change-password-card.component'
+import { TransactionType } from 'src/app/Accessories/constants/general-constant';
+import { TransactionFilterComponent } from '../transaction-filter/transaction-filter.component';
+import { HttpClient } from '@angular/common/http';
+import { HomeService } from 'src/app/Accessories/services/home.service';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss']
+})
+export class HeaderComponent implements OnInit {
+
+  activeUrl : string;
+  innerwidth: any;
+  displayModal:boolean;
+  displayNotificationModal:boolean;
+  constructor(private router: Router,
+    private http:HttpClient,
+    private homeService:HomeService,
+    private modalService:NgbModal) {
+    this.innerwidth = window.innerWidth;
+   }
+   @HostListener('window:resize', ['$event'])
+   onResize(event) {
+     this.innerwidth = window.innerWidth;
+   }
+  ngOnInit(): void {
+    this.homeService.getIpAddress().subscribe(response=>{
+      console.log('response',response)
+    });
+
+
+  }
+  openmodal(){
+    const modalref = this.modalService.open(ChangePasswordCardComponent, {
+      centered: true,
+      size: "lg",
+    })
+  }
+  isActiveMenu(url){
+        this.activeUrl = url;
+  }
+  routeToTransact(item){
+     this.router.navigate(['home/transact/select-scheme'], {
+        queryParams: { plan: (item == TransactionType.redeem)? TransactionType.redeem:TransactionType.switch },
+      });
+  }
+  showModal() {
+    this.displayModal = true;
+  }
+  closePopup(option?) {
+    this.displayModal = false;
+  }
+  // showNotification(){
+  //   this.displayNotificationModal =true;
+  // }
+}
